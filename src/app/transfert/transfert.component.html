@@ -1,0 +1,81 @@
+<div class="row justify-content-between">
+
+  <div class="text-dark row justify-content-start" >
+    <h6>&nbsp; &nbsp; Send Money</h6>
+  </div>
+
+  <div class="justify-content-end">
+    <button class="btn btn-primary btn-sm font-weight-bold" (click)="navigateToAccount()">&nbsp; Add Connection &nbsp;</button>
+  </div>
+
+</div>
+
+
+<div class="row justify-content-center bg-my p-5">
+
+  <form [formGroup]="transactionForm"  class="form-inline">
+
+    <div class="form-group">
+      <select id              ="connection"
+              formControlName ="connection"
+              class           ="form-control border border-dark" >
+        <option [ngValue]="null" value="undefined" disabled selected>Select A Connection</option>
+        <option *ngFor="let connection of client.connections" [ngValue]="connection">{{connection.name}}</option>
+      </select>
+    </div>
+    &nbsp; &nbsp; &nbsp; &nbsp;
+    <div class="form-group">
+      <input id="description" type="text"   formControlName="description"    placeholder="Description"   class="form-control text-center border border-dark"  m="0"  >
+    </div>
+    &nbsp; &nbsp; &nbsp; &nbsp;
+    <div class="form-group">
+      <input id="amount"      type="number" formControlName="amount"   min="1"     placeholder="Amount"        class="form-control text-right border border-dark">
+      <div class="input-group-addon" >&nbsp;€</div>
+    </div>
+    &nbsp; &nbsp; &nbsp; &nbsp;
+    <div>
+      <button type="submit" (click)="onSubmitForm()"   [disabled]="transactionForm.invalid" class="btn btn-success font-weight-bold">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Pay &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>
+    </div>
+
+  </form>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+
+
+<div class="text-dark row justify-content-start" >
+  <h6>My Transactions</h6>
+</div>
+
+
+<div class="row justify-content-between">
+  <table class="table table-striped text-center border border-dark">
+    <thead class="p-3 mb-2 bg-success text-white">
+      <tr>
+<!--        <th scope="col">Date</th>-->
+        <th scope="col">Connection</th>
+        <th scope="col">Description</th>
+        <th scope="col">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let transaction of client.transactions">
+<!--        <td>-->
+<!--          {{transaction.moment | date : "dd MMMM  yyyy"}}-->
+<!--        </td>-->
+        <td>
+          {{transaction.connectionName}}
+        </td>
+        <td>
+          {{transaction.description}}
+        </td>
+        <td>
+          {{transaction.amount}} &nbsp; €
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

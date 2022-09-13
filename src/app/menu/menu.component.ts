@@ -1,15 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {Router} from "@angular/router";
+import {Client} from "../Model/Client";
+import {DataService} from "../data.service";
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css']
 })
-export class MenuComponent implements OnInit {
+export class MenuComponent implements OnInit
+{
 
-  constructor() { }
+  public navigation !: string;
+  client            !: Client;
 
-  ngOnInit(): void {
+
+  constructor(
+              private router:Router,
+              private dataService : DataService
+             ) { }
+
+  ngOnInit(): void
+  {
+    this.client = this.dataService.client;
   }
 
+  navigateToTransfert()
+  {
+    this.router.navigateByUrl("home/transfert");
+    this.navigation = "Transfert";
+  }
+
+  navigateToAccount()
+  {
+    this.router.navigateByUrl("home/account");
+    this.navigation = "Account";
+  }
 }
