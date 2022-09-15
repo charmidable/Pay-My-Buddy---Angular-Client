@@ -8,11 +8,14 @@ import { LoginComponent }                 from './login/login.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { AccountComponent }               from './account/account.component';
 import {RouterModule, Routes}             from "@angular/router";
+import {HttpClientModule} from "@angular/common/http";
+import {AuthRouteGuardService} from "./auth-route-guard.service";
 
 
 const routes: Routes =  [
-                            {path : "home/transfert", component : TransfertComponent},
-                            {path : "home/account",   component : AccountComponent}
+                            {path : "home/transfert", component : TransfertComponent, canActivate : [AuthRouteGuardService]},
+                            {path : "home/account",   component : AccountComponent,   canActivate : [AuthRouteGuardService]},
+                            {path : "login",          component : LoginComponent}
                         ];
 
 @NgModule
@@ -29,6 +32,7 @@ const routes: Routes =  [
     imports:      [
                     FormsModule,
                     BrowserModule,
+                    HttpClientModule,
                     ReactiveFormsModule,
                     RouterModule.forRoot(routes)
                   ],

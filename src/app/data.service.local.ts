@@ -3,8 +3,6 @@ import {Connection}  from "./Model/Connection";
 import {Transaction} from "./Model/Transaction";
 import {Client}      from "./Model/Client";
 import {environment} from "../environments/environment";
-import {Observable} from "rxjs";
-import {HttpClient} from "@angular/common/http";
 
 @Injectable
 (
@@ -17,7 +15,7 @@ export class DataService
   connections  = new Array<Connection>();
   client       !: Client;
 
-  constructor(private http: HttpClient)
+  constructor()
   {
     console.log(environment.restUrl);
 
@@ -130,9 +128,9 @@ export class DataService
   addClientTransaction(formValue: {amount:number, description:string, connection: Connection}) : void
   {
     const transaction : Transaction = {
-                                          ...formValue,
-                                          moment        : new Date(),
-                                          connectionName: formValue.connection.name
+                                        ...formValue,
+                                        moment        : new Date(),
+                                        connectionName: formValue.connection.name
                                       };
 
     if(transaction.amount > 0)
@@ -155,12 +153,12 @@ export class DataService
 
     if (description === "Withdrawal")
     {
-      this.client.balance = this.client.balance + amount * (- 1.005);
+      this.client.balance = this.client.balance + amount// * (- 1.005);
       transaction.amount = amount * -1;
     }
     else
     {
-      this.client.balance = this.client.balance + amount * (0.995);
+      this.client.balance = this.client.balance + amount// * (0.995);
       transaction.amount = amount;
     }
 
@@ -172,10 +170,5 @@ export class DataService
   addClientConnection(newConnection : Connection) : void
   {
     this.client.connections.push(newConnection);
-  }
-
-  getClient(id:number) : Observable<Client>
-  {
-    return this.http.get<Client>(environment.restUrl + "/api/clients/" + id);
   }
 }

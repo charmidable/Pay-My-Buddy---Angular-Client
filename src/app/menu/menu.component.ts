@@ -22,6 +22,14 @@ export class MenuComponent implements OnInit
 
   ngOnInit(): void
   {
+    this.dataService.getClient(1).subscribe
+    (
+  next => {
+                  console.log(next.name);
+                  console.log(next.id);
+                  console.log(next.accountId);
+               }
+    )
     this.client = this.dataService.client;
   }
 
