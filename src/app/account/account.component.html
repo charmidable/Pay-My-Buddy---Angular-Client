@@ -4,32 +4,60 @@
 </div>
 <br/>
 <br/>
-<div class="row justify-content-between">
+<!--<div class="row justify-content-between">-->
 
   <div class="text-dark row justify-content-start" >
-    <h6>&nbsp; &nbsp; Manage Your Connections</h6>
+    <h6>Manage Your Connections</h6>
   </div>
+<!--</div>-->
 
-<!--  <div class="justify-content-end">-->
-<!--    <button class="btn btn-primary btn-sm font-weight-bold" (click)="navigateToTransfert()">&nbsp; &nbsp; Do Transaction &nbsp;</button>-->
-<!--  </div>-->
-</div>
+
+<!--<div class="row justify-content-center bg-my p-5">-->
+
+<!--  <form  class="form-inline"   (ngSubmit)="onSubmitConnectionForm()" >-->
+
+<!--    <div class="form-group">-->
+<!--      <select id   ="connectionId"-->
+<!--              name ="connectionName"-->
+<!--              class="form-control border border-dark"  [(ngModel)]="newConnection" >-->
+<!--        <option [ngValue]="null" value="undefined" disabled selected>Select A Connection </option>-->
+<!--        <option *ngFor="let connection of getConnections()" [ngValue]="connection"   name="selectedConnection"  >{{connection.name}}</option>-->
+<!--      </select>-->
+<!--    </div>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;-->
+<!--    <div>-->
+<!--      <button type="submit"     class="btn btn-success font-weight-bold">&nbsp; &nbsp; Add Connection &nbsp; &nbsp;</button>-->
+<!--    </div>-->
+<!--  </form>-->
+<!--</div>-->
+
 
 
 <div class="row justify-content-center bg-my p-5">
-
-  <form  class="form-inline"   (ngSubmit)="onSubmitConnectionForm()" >
+  <form [formGroup]="connectionOperationForm" class="form-inline">
+    <div class="form-group">
+      <select
+        id              ="connectionDescription"
+        formControlName ="description"
+        class           ="form-control border border-dark" >
+        <option [ngValue]="null" value="undefined" disabled selected>Select An Operation</option>
+        <option value="New Connection">New Connection</option>
+<!--        <option value="Remove Connection">Remove Connection </option>-->
+      </select>
+    </div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 
     <div class="form-group">
-      <select id   ="connectionId"
-              name ="connectionName"
-              class="form-control border border-dark"  [(ngModel)]="newConnection" >
-        <option [ngValue]="null" value="undefined" disabled selected>Select A Connection </option>
-        <option *ngFor="let connection of getConnections()" [ngValue]="connection"   name="selectedConnection"  >{{connection.name}}</option>
+      <select *ngIf="initNotYetConnected()"
+        id              = "connect"
+        formControlName = "connection"
+        class           = "form-control border border-dark" >
+        <option [ngValue]="null" value="undefined" disabled selected>Select A Connection</option>
+
+        <option *ngFor="let connection of initNotYetConnected()" [ngValue]="connection">{{connection.email}}</option>
+
       </select>
-    </div>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+    </div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     <div>
-      <button type="submit"     class="btn btn-success font-weight-bold">&nbsp; &nbsp; Add Connection &nbsp; &nbsp;</button>
+      <button type="submit" (click)="onSubmitConnectionForm()" [disabled]="connectionOperationForm.invalid" class="btn btn-success font-weight-bold">&nbsp; &nbsp; &nbsp; &nbsp; Execute &nbsp; &nbsp; &nbsp; &nbsp;</button>
     </div>
   </form>
 </div>
@@ -42,26 +70,28 @@
   <h6>Manage Your Balance</h6>
 </div>
 
-
 <div class="row justify-content-center bg-my p-5">
 
-  <form  class="form-inline"   (ngSubmit)="onSubmitBalanceForm()" >
+<form [formGroup]="balanceOperationForm" class="form-inline">
 
-    <div class="form-group">
-      <select id   ="operationId"
-              name ="operationName"
-              class="form-control border border-dark"  [(ngModel)]="operation" >
-        <option [ngValue]="null" value="undefined" disabled selected>Select An Operation</option>
-        <option value="Withdrawal">Withdrawal</option>
-        <option value="Remittance">Remittance </option>
-      </select>&nbsp; &nbsp; &nbsp; &nbsp;
-      <div class="form-group">
-        <input id="amount"   type="number" name="amount" min="1"    placeholder="Amount"  [(ngModel)]="amount"  class="form-control text-right border border-dark">
-        <div class="input-group-addon" >&nbsp;€</div>
-      </div>
-    </div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-    <div>
-      <button type="submit" class="btn btn-success font-weight-bold">&nbsp; &nbsp; &nbsp; &nbsp; Execute &nbsp; &nbsp; &nbsp; &nbsp;</button>
-    </div>
-  </form>
+  <div class="form-group">
+
+    <select
+            id              ="description"
+            formControlName ="description"
+            class           ="form-control border border-dark" >
+      <option [ngValue]="null" value="undefined" disabled selected>Select An Operation</option>
+      <option value="Withdrawal">Withdrawal</option>
+      <option value="Deposit">Deposit </option>
+    </select>
+  </div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  <div class="form-group">
+    <input id="amount"      type="number" formControlName="amount"   min="1"     placeholder="Amount"        class="form-control text-right border border-dark">
+    <div class="input-group-addon" >&nbsp;€</div>
+  </div>
+  &nbsp; &nbsp; &nbsp; &nbsp;
+  <div>
+    <button type="submit" (click)="onSubmitBalanceForm()" [disabled]="balanceOperationForm.invalid" class="btn btn-success font-weight-bold">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Pay &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>
+  </div>
+</form>
 </div>

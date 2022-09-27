@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {CanActivate} from "@angular/router";
+import {DataService} from "./data.service";
 
 @Injectable
 (
@@ -14,13 +15,14 @@ export class AuthService
   //==========================
 
   isAuthenticated: boolean = false;
+  authentificationResultEvent = new EventEmitter<boolean>();
 
 
   //==========================
   //=      Constructor       =
   //==========================
 
-  constructor()
+  constructor(private dataService: DataService)
   {
 
   }
@@ -30,16 +32,18 @@ export class AuthService
   //=    business methods    =
   //==========================
 
-  authenticate(email: string, password: string): boolean
+  authenticate(email: string, password: string)
   {
-    if (email === "gg@gg.fr" && password === "root")
-    {
-      this.isAuthenticated = true;
-    }
-    return this.isAuthenticated;
+    this.dataService.validateUser(email, password).subscribe
+    (
+      next => {
+                    this.isAuthenticated = true;
+                    this.authentificationResultEvent.emit(true);
+                  },
+      error => {
+                      this.isAuthenticated = false;
+                      this.authentificationResultEvent.emit(false);
+                    }
+    )
   }
-
-
-
-
 }

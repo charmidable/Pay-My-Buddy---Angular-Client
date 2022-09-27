@@ -1,36 +1,33 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
-import {Client} from "../Model/Client";
-import {DataService} from "../data.service";
+import {ActivatedRoute, Router} from "@angular/router";
 
-@Component({
-  selector: 'app-menu',
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.css']
-})
+import {DataService}              from "../data.service";
+import {AuthService}              from "../auth.service";
+
+
+@Component
+(
+  {
+    selector: 'app-menu',
+    templateUrl: './menu.component.html',
+    styleUrls: ['./menu.component.css']
+  }
+)
 export class MenuComponent implements OnInit
 {
 
-  public navigation !: string;
-  client            !: Client;
+  navigation !: string
 
 
   constructor(
-              private router:Router,
-              private dataService : DataService
+              private router        :Router,
+              public dataService    : DataService,
+              public authService    : AuthService
              ) { }
 
   ngOnInit(): void
   {
-    this.dataService.getClient(1).subscribe
-    (
-  next => {
-                  console.log(next.name);
-                  console.log(next.id);
-                  console.log(next.accountId);
-               }
-    )
-    this.client = this.dataService.client;
+
   }
 
   navigateToTransfert()
@@ -43,5 +40,11 @@ export class MenuComponent implements OnInit
   {
     this.router.navigateByUrl("home/account");
     this.navigation = "Account";
+  }
+
+  logOff()
+  {
+    this.authService.isAuthenticated = false;
+    this.router.navigateByUrl("login");
   }
 }

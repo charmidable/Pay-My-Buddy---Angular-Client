@@ -10,9 +10,8 @@ export class Client
   name          !: string;
   balance       !: number;
   accountId     !: number;
-  transactions  !: Array<Transaction>;
   connections   !: Array<Connection>;
-
+  transactions  !: Array<Transaction>;
 
   //==========================
   //=      Constructor       =
@@ -55,6 +54,33 @@ export class Client
     );
     return this.connections;
   }
+
+
+  static fromHttp(httpCllient : Client) : Client
+  {
+    const client      = new Client();
+
+    client.id           = httpCllient.id;
+    client.balance      = httpCllient.balance;
+    client.accountId    = httpCllient.accountId;
+    client.connections  = new Array<Connection>();
+    client.transactions = new Array<Transaction>();
+
+    for(const httpConnection of httpCllient.connections)
+    {
+      client.connections.push(Connection.fromHttp(httpConnection));
+    }
+
+    for(const httpTransaction of httpCllient.transactions)
+    {
+      client.transactions.push(Transaction.fromHttp(httpTransaction));
+    }
+
+    return client;
+  }
+
+
+
 
 
   // filterNotYetConnected(allConnections : Array<Connection>) : Array<Connection>

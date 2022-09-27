@@ -80,25 +80,25 @@ export class DataService
     c10.clientId  = 10;
 
     const t3 = new Transaction();
-    t3.amount = 25;
+    t3.restAmount = 25;
     t3.description = "Restaurant bill share"
     t3.moment = new Date();
     t3.connectionName = "Haley";
 
     const t2 = new Transaction();
-    t2.amount = 25;
+    t2.restAmount = 25;
     t2.description = "Trip Money"
     t2.moment = new Date();
     t2.connectionName = "Clara";
 
     const t1 = new Transaction();
-    t1.amount = 8;
+    t1.restAmount = 8;
     t1.description = "Movie tickets"
     t1.moment = new Date();
     t1.connectionName = "Smith";
 
     const t5 = new Transaction();
-    t5.amount = -39;
+    t5.restAmount = -39;
     t5.description = "Motorway tolls"
     t5.moment = new Date();
     t5.connectionName = "Claris";
@@ -133,9 +133,9 @@ export class DataService
                                         connectionName: formValue.connection.name
                                       };
 
-    if(transaction.amount > 0)
+    if(transaction.restAmount > 0)
     {
-      this.client.balance = this.client.balance - transaction.amount * 1.005;
+      this.client.balance = this.client.balance - transaction.restAmount * 1.005;
 
       this.client.transactions.unshift(transaction);
     }
@@ -154,12 +154,12 @@ export class DataService
     if (description === "Withdrawal")
     {
       this.client.balance = this.client.balance + amount// * (- 1.005);
-      transaction.amount = amount * -1;
+      transaction.restAmount = amount * -1;
     }
     else
     {
       this.client.balance = this.client.balance + amount// * (0.995);
-      transaction.amount = amount;
+      transaction.restAmount = amount;
     }
 
     console.log("balance after " + description + " : " + this.client.balance);

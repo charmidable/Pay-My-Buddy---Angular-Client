@@ -1,10 +1,12 @@
-import { Injectable }   from '@angular/core';
+import {EventEmitter, Injectable, OnInit} from '@angular/core';
 import {Connection}  from "./Model/Connection";
 import {Transaction} from "./Model/Transaction";
 import {Client}      from "./Model/Client";
 import {environment} from "../environments/environment";
-import {Observable} from "rxjs";
-import {HttpClient} from "@angular/common/http";
+import {map, Observable} from "rxjs";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {Account} from "./Model/Account";
+import {ConnectionOperation} from "./Model/ConnectionOperation";
 
 @Injectable
 (
@@ -12,13 +14,16 @@ import {HttpClient} from "@angular/common/http";
     providedIn: 'root'
   }
 )
-export class DataService
+export class DataService implements OnInit
 {
-  connections  = new Array<Connection>();
-  client       !: Client;
+  addConnectionResultEvent = new EventEmitter<any>();
+  connections = new Array<Connection>();
+  client        !: Client;
+  email         !: string;
 
   constructor(private http: HttpClient)
   {
+    /*
     console.log(environment.restUrl);
 
     const c1      = new Connection();
@@ -118,64 +123,165 @@ export class DataService
     this.client.accountId = 99;
     this.client.transactions = clientTransaction;
     this.client.connections = clientConnections;
+    */
+  }
+
+  ngOnInit(): void
+  {
+
+  }
+
+
+  validateUser(email: string, password: string) : Observable<string>
+  {
+    const authData = btoa(`${email}:${password}`);
+
+    const header = new HttpHeaders().append("Authorization", "Basic " + authData );
+
+    return this.http.get<string>(environment.restUrl + "/api/basicAuth/validate", {headers: header});
+  }
+
+  loadClient()
+  {
+    this.getClient().subscribe
+    (next  => {
+                      this.client = next;
+                      // this.loadingClient = false;
+                      // this.client.connections = this.client.connections.map(obj => this.connections.find(o => o.clientId === obj.clientId) || obj);
+                   }
+    );
+  }
+
+  getClient() : Observable<Client>
+  {
+    console.log("****** getClient CALLED *****");
+
+   return this.http.get<Client>(environment.restUrl + "/api/clients/" + this.email).pipe
+    (
+      map( data => {
+                            let client : Client;
+
+                            client = Client.fromHttp(data);
+
+                            this.client = client;
+                            this.client.connections = this.client.connections.map(obj => this.connections.find(o => o.clientId === obj.clientId) || obj);
+                            return client;
+                          }
+         )
+    )
+  }
+
+
+  getAllConnections() : Observable<Array<Connection>>
+  {
+    console.log("****** getAllConnections CALLED *****");
+
+    return this.http.get<Array<Connection>>(environment.restUrl + "/api/connections").pipe
+    (
+      map(data => {
+                            const connections = new Array<Connection>();
+
+                            for (const connection of data)
+                            {
+                              connections.push(Connection.fromHttp(connection));
+                            }
+
+                            this.connections = connections;
+
+                            return connections;
+                         }
+        )
+    );
+  }
+
+
+  addTransaction(dtoTransaction : object) : Observable<Transaction[]>
+  {
+    return this.http.post<Account>(environment.restUrl + "/api/transactions", dtoTransaction).pipe
+    (
+      map(
+        data => {
+                        const transactions = new Array<Transaction>();
+
+                        for(const httpTransaction of data.transactions)
+                        {
+                          transactions.push(Transaction.fromHttp(httpTransaction));
+                        }
+                        this.client.balance = data.balance;
+                        this.client.transactions = transactions;
+
+                        return transactions;
+                      }
+        )
+    )
+  }
+
+
+  addClientConnection(connectionOperation : ConnectionOperation) : Observable<string>
+  {
+    console.log("dataService.addClientConnection CALLED");
+    let connectionDto = {
+                          clientId : this.client.id,
+                          connectId : connectionOperation.connection.clientId
+                        }
+
+
+    let result  = this.http.post<string>(environment.restUrl + "/api/connections", connectionDto);
+
+    this.addConnectionResultEvent.emit();
+
+    return result;
   }
 
 
   filterNotYetConnected() : Array<Connection>
   {
-    return this.connections.filter(item => !this.client.connections.includes(item));
+    let tab = this.connections.filter(item => !this.client.connections.includes(item));
+    this.sortConnectionArrayByEmail(tab);
+    return tab;
   }
 
 
-  addClientTransaction(formValue: {amount:number, description:string, connection: Connection}) : void
+  sortConnectionArrayByEmail(tab: Array<Connection>)
   {
-    const transaction : Transaction = {
-                                          ...formValue,
-                                          moment        : new Date(),
-                                          connectionName: formValue.connection.name
-                                      };
-
-    if(transaction.amount > 0)
-    {
-      this.client.balance = this.client.balance - transaction.amount * 1.005;
-
-      this.client.transactions.unshift(transaction);
-    }
+    tab.sort
+    (
+      function(x,y)
+      {
+        if (x.email.toLowerCase() > y.email.toLowerCase()) {
+          return 1;
+        }
+        if (x.email.toLowerCase() < y.email.toLowerCase())
+        {
+          return  - 1
+        }
+        return 0;
+      }
+    );
   }
 
-
-  balanceOperation(amount : number, description : string)
+  sortConnectionArrayByName(tab: Array<Connection>)
   {
-    const transaction : Transaction = new Transaction();
-
-    transaction.connectionName ="";
-    transaction.description = description;
-
-    console.log("balance before " + description + " : " + this.client.balance);
-
-    if (description === "Withdrawal")
-    {
-      this.client.balance = this.client.balance + amount * (- 1.005);
-      transaction.amount = amount * -1;
-    }
-    else
-    {
-      this.client.balance = this.client.balance + amount * (0.995);
-      transaction.amount = amount;
-    }
-
-    console.log("balance after " + description + " : " + this.client.balance);
-    this.client.transactions.unshift(transaction);
+    tab.sort
+    (
+      function(x,y)
+      {
+        if (x.name.toLowerCase() > y.name.toLowerCase()) {
+          return 1;
+        }
+        if (x.name.toLowerCase() < y.name.toLowerCase())
+        {
+          return  - 1
+        }
+        return 0;
+      }
+    );
   }
 
-
-  addClientConnection(newConnection : Connection) : void
+  getClientConnectionsSortedByName() : Array<Connection>
   {
-    this.client.connections.push(newConnection);
-  }
-
-  getClient(id:number) : Observable<Client>
-  {
-    return this.http.get<Client>(environment.restUrl + "/api/clients/" + id);
+    const cloned  = [...this.client.connections];
+    this.sortConnectionArrayByName(cloned);
+    return cloned;
   }
 }

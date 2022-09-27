@@ -16,11 +16,14 @@
   <form [formGroup]="transactionForm"  class="form-inline">
 
     <div class="form-group">
-      <select id              ="connection"
+
+      <select *ngIf="!loadingClient"
+              id              ="connection"
               formControlName ="connection"
-              class           ="form-control border border-dark" >
+              class           ="form-control border border-dark">
         <option [ngValue]="null" value="undefined" disabled selected>Select A Connection</option>
-        <option *ngFor="let connection of client.connections" [ngValue]="connection">{{connection.name}}</option>
+
+        <option *ngFor="let connection of clientConnections" [ngValue]="connection">{{connection.name}}</option>
       </select>
     </div>
     &nbsp; &nbsp; &nbsp; &nbsp;
@@ -53,16 +56,16 @@
 
 <div class="row justify-content-between">
   <table class="table table-striped text-center border border-dark">
-    <thead class="p-3 mb-2 bg-success text-white">
+    <thead class="p-3 mb-2 bg-success text-center text-white">
       <tr>
 <!--        <th scope="col">Date</th>-->
         <th scope="col">Connection</th>
         <th scope="col">Description</th>
-        <th scope="col">Amount</th>
+        <th scope="col" colSpan="2">Amount</th>
       </tr>
     </thead>
-    <tbody>
-      <tr *ngFor="let transaction of client.transactions">
+    <tbody *ngIf="client">
+      <tr  border="0" *ngFor="let transaction of client.transactions | paginate: { itemsPerPage: 3, currentPage: pages }">
 <!--        <td>-->
 <!--          {{transaction.moment | date : "dd MMMM  yyyy"}}-->
 <!--        </td>-->
@@ -72,10 +75,16 @@
         <td>
           {{transaction.description}}
         </td>
-        <td>
-          {{transaction.amount}} &nbsp; €
+        <td class="pull-right">
+          {{transaction.amount | number}}
+        </td>
+        <td align="left">€ &nbsp;&nbsp;
         </td>
       </tr>
     </tbody>
   </table>
+
+</div>
+<div class="text-center text-primary">
+  <pagination-controls class="text-primary" (pageChange)="pages = $event" previousLabel="" nextLabel=""></pagination-controls>
 </div>
