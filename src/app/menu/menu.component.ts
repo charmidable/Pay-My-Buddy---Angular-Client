@@ -15,19 +15,16 @@ import {AuthService}              from "../auth.service";
 )
 export class MenuComponent implements OnInit
 {
-
-  navigation !: string
-
+  navigation  !: string
 
   constructor(
-              private router        :Router,
-              public dataService    : DataService,
-              public authService    : AuthService
+              private router      : Router,
+              public  dataService : DataService,
+              public  authService : AuthService
              ) { }
 
   ngOnInit(): void
   {
-
   }
 
   navigateToTransfert()
@@ -46,5 +43,6 @@ export class MenuComponent implements OnInit
   {
     this.authService.isAuthenticated = false;
     this.router.navigateByUrl("login");
+    this.navigation = "Login";
   }
 }

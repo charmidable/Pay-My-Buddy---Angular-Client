@@ -1,12 +1,11 @@
-import {Component, EventEmitter, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators}         from "@angular/forms";
-import {Router}                                     from "@angular/router";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Component, EventEmitter, OnInit}    from '@angular/core';
+import {ConnectionOperation}                from "../Model/ConnectionOperation";
+import {BalanceOperation}                   from "../Model/BalanceOperation";
+import {DataService}                        from "../data.service";
+import {Transaction}                        from "../Model/Transaction";
+import {Connection}                         from "../Model/Connection";
 
-import {Connection}                                 from "../Model/Connection";
-import {DataService}                                from "../data.service";
-import {Transaction}                                from "../Model/Transaction";
-import {BalanceOperation}                           from "../Model/BalanceOperation";
-import {ConnectionOperation}                        from "../Model/ConnectionOperation";
 
 @Component
 (
@@ -22,16 +21,6 @@ export class AccountComponent implements OnInit
   //=      Attributes        =
   //==========================
 
-  // reloadAttemps  : number  = 0;
-  // newConnection !: Connection;
-  // connections   !: Array<Connection>;
-  // notYetConnect !: Array<Connection>;
-  // nullAmount    !: number;
-  // operation     !: string;
-  // message       !: string;
-  // loading        : boolean = true;
-  // client        !: Client;
-  // amount        !: number;
 
   balanceOperationForm     !: FormGroup;
   connectionOperationForm  !: FormGroup;
@@ -46,17 +35,12 @@ export class AccountComponent implements OnInit
   constructor
   (
     private dataService : DataService,
-    private formBuilder : FormBuilder,
-    private router      : Router
+    private formBuilder : FormBuilder
   )
   {}
 
   ngOnInit(): void
   {
-    // this.loadData();
-    // this.connections = this.dataService.connections;
-    // this.dataService.initClientConnections()
-    // this.initNotYetConnected();
 
     this.balanceOperationForm     = this.formBuilder.group
     (
@@ -83,37 +67,6 @@ export class AccountComponent implements OnInit
     );
   }
 
-  // private loadData()
-  // {
-  //   this.dataService.getAllConnections().subscribe
-  //   (
-  //     next  => {
-  //                     this.connections = next;
-  //                     this.loading = false;
-  //                   },
-  //
-  //     error => {
-  //                     if(error.status === 402)
-  //                     {
-  //                       this.message = "Sorry, we cannnot load connections";
-  //                     }
-  //                     else
-  //                     {
-  //                       this.reloadAttemps ++;
-  //                       if(this.reloadAttemps <= 10)
-  //                       {
-  //                         this.message = "Sorry, something went wrong, trying again.... please wait";
-  //                         this.loadData();
-  //                       }
-  //                       else
-  //                       {
-  //                         this.message = "Sorry, something went wrong, please contact support";
-  //                       }
-  //                     }
-  //                     console.log("this.reloadAttemps = " + this.reloadAttemps)
-  //                   }
-  //   );
-  // }
   //==========================
   //=    business methods    =
   //==========================
@@ -124,41 +77,6 @@ export class AccountComponent implements OnInit
     return  this.dataService.filterNotYetConnected();
     return null;
   }
-
-  // getConnections() : Array<Connection>
-  // {
-  //   this.connections.sort
-  //   (
-  //     function(x,y)
-  //     {
-  //       if (x.name.toLowerCase() > y.name.toLowerCase()) {
-  //         return 1;
-  //       }
-  //       if (x.name.toLowerCase() < y.name.toLowerCase())
-  //       {
-  //         return  - 1
-  //       }
-  //       return 0;
-  //     }
-  //   );
-  //   return this.connections;
-  // }
-
-
-  navigateToTransfert()
-  {
-    this.router.navigateByUrl("home/transfert");
-  }
-
-
-  // onSubmitConnectionForm() : void
-  // {
-  //   if(this.newConnection.clientId != 0)
-  //   {
-  //     this.dataService.addClientConnection(this.newConnection);
-  //     // this.initNotYetConnected()
-  //   }
-  // }
 
 
   onSubmitBalanceForm()
@@ -174,6 +92,11 @@ export class AccountComponent implements OnInit
 
       if (formValue.description === "Withdrawal")
       {
+        if(this.dataService.client.balance < formValue.amount)
+        {
+          alert("You cannot withdrawal more than your balance account");
+          return;
+        }
         this.dataService.client.balance = this.dataService.client.balance - formValue.amount;
       }
       else
@@ -200,31 +123,19 @@ export class AccountComponent implements OnInit
   }
 
 
-
-
-
-
-  // onSubmitConnectionForm()
-  // {
-  //   let connectionDto = {
-  //                         clientId : this.dataService.client.id,
-  //                         connectionId : this.connectionOperationForm.value.
-  //                       }
-  //   this.dataService.addClientConnection({ ...this.connectionOperationForm.value })
-  //   this.connectionOperationForm.reset();
-  // }
-
   onSubmitConnectionForm()
   {
-    console.log("AccountComponent.onSubmitConnectionForm CALLED");
     this.connectionOperation(this.connectionOperationForm.value);
     this.connectionOperationForm.reset();
   }
 
   connectionOperation(formValue: {description:string, connection:Connection})
   {
-    console.log("connectionOperation.onSubmitConnectionForm CALLED");
     const operation: ConnectionOperation =  { ...formValue };
-    this.dataService.addClientConnection(operation).subscribe(next => this.newConnectionEvent.emit());
+
+    if(operation.connection.clientId != this.dataService.client.id)
+    {
+      this.dataService.addClientConnection(operation).subscribe(next => this.newConnectionEvent.emit());
+    }
   }
 }

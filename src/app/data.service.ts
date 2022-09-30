@@ -7,6 +7,7 @@ import {map, Observable} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Account} from "./Model/Account";
 import {ConnectionOperation} from "./Model/ConnectionOperation";
+import {ClientData} from "./Model/ClientData";
 
 @Injectable
 (
@@ -16,10 +17,10 @@ import {ConnectionOperation} from "./Model/ConnectionOperation";
 )
 export class DataService implements OnInit
 {
-  addConnectionResultEvent = new EventEmitter<any>();
-  connections = new Array<Connection>();
-  client        !: Client;
-  email         !: string;
+  addConnectionResultEvent  = new EventEmitter<any>();
+  connections               !: Array<Connection>;
+  client                    !: Client;
+  email                     !: string;
 
   constructor(private http: HttpClient)
   {
@@ -131,7 +132,6 @@ export class DataService implements OnInit
 
   }
 
-
   validateUser(email: string, password: string) : Observable<string>
   {
     const authData = btoa(`${email}:${password}`);
@@ -141,22 +141,23 @@ export class DataService implements OnInit
     return this.http.get<string>(environment.restUrl + "/api/basicAuth/validate", {headers: header});
   }
 
+  createNewClient(clientData: ClientData) : Observable<string>
+  {
+    return this.http.post<string>(environment.restUrl + "/api/clients/", clientData);
+  }
+
   loadClient()
   {
     this.getClient().subscribe
     (next  => {
                       this.client = next;
-                      // this.loadingClient = false;
-                      // this.client.connections = this.client.connections.map(obj => this.connections.find(o => o.clientId === obj.clientId) || obj);
                    }
     );
   }
 
   getClient() : Observable<Client>
   {
-    console.log("****** getClient CALLED *****");
-
-   return this.http.get<Client>(environment.restUrl + "/api/clients/" + this.email).pipe
+    return this.http.get<Client>(environment.restUrl + "/api/clients/" + this.email).pipe
     (
       map( data => {
                             let client : Client;
@@ -174,8 +175,6 @@ export class DataService implements OnInit
 
   getAllConnections() : Observable<Array<Connection>>
   {
-    console.log("****** getAllConnections CALLED *****");
-
     return this.http.get<Array<Connection>>(environment.restUrl + "/api/connections").pipe
     (
       map(data => {
@@ -219,7 +218,6 @@ export class DataService implements OnInit
 
   addClientConnection(connectionOperation : ConnectionOperation) : Observable<string>
   {
-    console.log("dataService.addClientConnection CALLED");
     let connectionDto = {
                           clientId : this.client.id,
                           connectId : connectionOperation.connection.clientId
@@ -232,6 +230,8 @@ export class DataService implements OnInit
 
     return result;
   }
+
+
 
 
   filterNotYetConnected() : Array<Connection>
@@ -284,4 +284,29 @@ export class DataService implements OnInit
     this.sortConnectionArrayByName(cloned);
     return cloned;
   }
+
+  isEmailAccountAlreadyExist(email: string): boolean
+  {
+    for(const connection of this.connections)
+    {
+      if(connection.email.toLowerCase() === email)
+      {
+        return  true;
+      }
+    }
+    return false;
+  }
+
+  isNickNameAccountAlreadyExist(name: string): boolean
+  {
+    for(const connection of this.connections)
+    {
+      if(connection.name.toLowerCase() === name)
+      {
+        return  true;
+      }
+    }
+    return false;
+  }
+
 }

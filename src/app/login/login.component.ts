@@ -54,7 +54,6 @@ export class LoginComponent implements OnInit, OnDestroy
                             url = "/home/account"
                             this.router.navigateByUrl(url);
                           }
-
                         }
                         else
                         {
@@ -86,5 +85,10 @@ export class LoginComponent implements OnInit, OnDestroy
   loadClient()
   {
     this.dataService.loadClient();
+  }
+
+  navigateToRegister()
+  {
+    this.router.navigateByUrl("register");
   }
 }

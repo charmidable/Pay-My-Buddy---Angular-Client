@@ -1,0 +1,75 @@
+<div class="row justify-content-center bg-light">
+  <div class=" bg-white  rounded  border border-dark p-3 m-5 w-25">
+    <div class="row justify-content-center">
+      <button type="button" class="HighLeftBtn button-1x btn-lg m-3">Pay My Buddy</button>
+    </div>
+    <br>
+    <form #ClientDataForm="ngForm">
+      <div>
+        <input id           = "name"
+               type         = "text"
+               name         = "name"
+               class        = "form-control text-left border border-dark"
+               placeholder  = "Nickname"
+               [(ngModel)]  = "clientDataForm.name"
+               (change)     = "checkName()"
+               #nameField   = "ngModel"
+               required
+        />
+        <div *ngIf="nameField.invalid && nameField.touched" class="alert alert-danger">name is required</div>
+        <div *ngIf="!nameIsValid && !nameField.invalid && nameField.touched" class="alert alert-danger">name cannot be blank</div>
+        <div *ngIf="!nameCanBeUsed && nameIsValid && !nameField.invalid && nameField.touched"    class="alert alert-danger">this nickname is already used</div>
+      </div>
+      <br>
+      <div>
+        <input id           = "email"
+               type         = "text"
+               name         = "email"
+               class        = "form-control text-left border border-dark"
+               placeholder  = "Email"
+               [(ngModel)]  = "clientDataForm.email"
+               (change)     = "checkEmail()"
+               #emailField   = "ngModel"
+               required
+        />
+        <div *ngIf="emailField.invalid && emailField.touched" class="alert alert-danger">email is required</div>
+        <div *ngIf="!emailIsValid && !emailField.invalid && emailField.touched" class="alert alert-danger">email cannot be blank</div>
+        <div *ngIf="!validEmailFormat && emailIsValid && !emailField.invalid && emailField.touched"  class="alert alert-danger">this is not a valid email</div>
+        <div *ngIf="!emailCanBeUsed && validEmailFormat && emailIsValid && !emailField.invalid && emailField.touched"    class="alert alert-danger">this email is already used</div>
+      </div>
+      <br>
+      <div>
+        <input id           = "password"
+               type         = "password"
+               name         = "password"
+               class        = "form-control text-left border border-dark"
+               placeholder  = "* Password"
+               (change)     = "checkIfPasswordIsValid()"
+               #passField   = "ngModel"
+               [(ngModel)]  = "clientDataForm.password"
+               required
+        />
+        <div *ngIf="passField.invalid && passField.touched" class="alert alert-danger">name is required</div>
+        <div *ngIf="!passwordIsValid && !passField.invalid && passField.touched" class="alert alert-danger">name cannot be blank</div>
+      </div>
+      <br>
+      <div class = "row justify-content-center">
+        <button type        = "button"
+                class       = "btn btn-primary m-3"
+                id          = "valid"
+                name        = "valid"
+                (click)     = "onSubmit()"
+                [disabled]  ="ClientDataForm.invalid || !nameIsValid || !nameCanBeUsed || !emailIsValid || !validEmailFormat|| !emailCanBeUsed || !passwordIsValid"
+        >
+          Create Account
+        </button>
+      </div>
+    </form>
+    <br>
+    <div class = "row justify-content-end">
+      <label>
+        <a class="nav-link ptn text-primary"  (click)="navigateToLogin()"><u>Or Sign Up</u></a>
+      </label>
+    </div>
+  </div>
+</div>

@@ -6,7 +6,7 @@ import {Transaction}                        from "../Model/Transaction";
 import {DataService}                        from "../data.service";
 import {Connection}                         from "../Model/Connection";
 import {Client}                             from "../Model/Client";
-import {Subscription} from "rxjs";
+import {Subscription}                       from "rxjs";
 
 
 
@@ -25,15 +25,14 @@ export class TransfertComponent implements OnInit
   //=      Attributes        =
   //==========================
 
+  pages              : number = 1;
   client            !: Client;
   message           !: string;
   subscription      !: Subscription;
-  reloadAttemps      : number  = 0;
   loadingClient      : boolean = true;
   transactionForm   !: FormGroup;
   dataChangedEvent   = new EventEmitter();
   clientConnections !: Array<Connection>;
-  pages: number = 1;
 
 
   //==========================
@@ -52,8 +51,6 @@ export class TransfertComponent implements OnInit
   {
     this.loadData();
 
-
-
     this.transactionForm  = this.formBuilder.group
     (
 {
@@ -71,34 +68,18 @@ export class TransfertComponent implements OnInit
       result => {
                         this.clientConnections = this.getClientConnections();
 
-      console.log("****** this.subscription = this.dataService.addConnectionResultEvent.subscribe *******")
-
         for (const connection of this.clientConnections)
         {
           console.log("*** " + connection.name + " ***");
         }
         this.ngOnInit()
       }
-
-
-      // result => {
-      //   if(result)
-      //   {
-      //     this.dataService.email = this.email;
-      //     this.loadClient();
-      //     const url = this.ActivatedRoute.snapshot.queryParams["requested"];
-      //     this.router.navigateByUrl(url);
-      //   }
-      //   else
-      //   {
-      //     alert("Your username or password was not recognized - try again.")
-      //     this.email    = "";
-      //     this.password = "";
-      //   }
-      // }
     );
   }
 
+  //==========================
+  //=   business methods     =
+  //==========================
 
   loadData()
   {
@@ -108,33 +89,9 @@ export class TransfertComponent implements OnInit
                       this.client = next;
                       this.clientConnections = this.getClientConnections();
                       this.loadingClient = false;
-                    },
-
-      error => {
-                        if(error.status === 402)
-                        {
-                          this.message = "Sorry, you cannot use this application.";
-                        }
-                        else
-                        {
-                          this.reloadAttemps ++;
-                          if(this.reloadAttemps <= 10)
-                          {
-                            this.message = "Sorry, something went wrong, trying again.... please wait";
-                            this.loadData();
-                          }
-                          else
-                          {
-                            this.message = "Sorry, something went wrong, please contact support";
-                          }
-                        }
-                      }
+                    }
     );
   }
-
-  //==========================
-  //=    business methods    =
-  //==========================
 
   navigateToAccount()
   {
@@ -154,7 +111,13 @@ export class TransfertComponent implements OnInit
     const transaction: Transaction = {
                                         ...formValue,
                                         connectionName: formValue.connection.name
-                                      };
+                                     };
+
+    if(formValue.amount > this.client.balance)
+    {
+      alert("You cannot transfert more than your balance account");
+      return;
+    }
 
     transaction.amount *= -1;
     this.client.balance = this.client.balance + transaction.amount * 1.005;

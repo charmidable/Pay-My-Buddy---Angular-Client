@@ -8,6 +8,7 @@ export class Client
   //==========================
   id            !: number;
   name          !: string;
+  email         !: string;
   balance       !: number;
   accountId     !: number;
   connections   !: Array<Connection>;
@@ -61,6 +62,8 @@ export class Client
     const client      = new Client();
 
     client.id           = httpCllient.id;
+    client.name         = httpCllient.name;
+    client.email        = httpCllient.email;
     client.balance      = httpCllient.balance;
     client.accountId    = httpCllient.accountId;
     client.connections  = new Array<Connection>();
