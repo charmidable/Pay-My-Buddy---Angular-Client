@@ -6,7 +6,7 @@ import { TestComponent }                    from './test/test.component';
 import { MenuComponent }                    from './menu/menu.component';
 import { LoginComponent }                   from './login/login.component';
 import { AccountComponent }                 from './account/account.component';
-import { HttpClientModule }                 from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import { RegisterComponent }                from './register/register.component';
 import { TransfertComponent }               from './transfert/transfert.component';
 import { NgxPaginationModule }              from "ngx-pagination";
@@ -20,8 +20,6 @@ const routes: Routes =  [
                             {path : "home/account",   component : AccountComponent,   canActivate : [AuthRouteGuardService]},
                             {path : "login",          component : LoginComponent},
                             {path : "register",       component : RegisterComponent}
-                            // {path : "",               component : LoginComponent},
-  // {path : "*",               component : LoginComponent},
                         ];
 
 @NgModule
@@ -45,9 +43,9 @@ const routes: Routes =  [
                     RouterModule.forRoot(routes),
                     NgxPaginationModule
                   ],
-    /******************************************/
+
     exports:      [RouterModule],
-    /*****************************************/
+
 
     providers:    [],
 

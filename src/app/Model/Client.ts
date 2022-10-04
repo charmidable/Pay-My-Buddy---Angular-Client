@@ -25,17 +25,6 @@ export class Client
   //==========================
 
 
-  // addClientTransaction(formValue: {amount:number, description:string, connection: Connection}) : void
-  // {
-  //   const transaction : Transaction = {
-  //                                       ...formValue,
-  //                                       moment        : new Date(),
-  //                                       connectionName: formValue.connection.name
-  //                                     };
-  //
-  //   this.transactions.unshift(transaction);
-  // }
-
 
   getClientConnections() : Array<Connection>
   {
@@ -83,11 +72,4 @@ export class Client
   }
 
 
-
-
-
-  // filterNotYetConnected(allConnections : Array<Connection>) : Array<Connection>
-  // {
-  //   return allConnections.filter(item => !this.connections.includes(item));
-  // }
 }
